@@ -18,7 +18,7 @@ class EntriesTagsAssociation(db.Model):
 class Entry(db.Model):
 	__tablename__ = "entries"
 	id = Column(Integer, primary_key = True)
-	name = Column(String, nullable = False)
+	name = Column(String, nullable = False, unique = True)
 	tags = relationship(EntriesTagsAssociation, backref="entries")
 
 	picture = Column(String, nullable = False)

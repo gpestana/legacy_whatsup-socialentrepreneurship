@@ -5,19 +5,19 @@ from app.forms import TestForm
 
 @app.route('/')
 def index():
-	
-	#db_proxy.addEntry("entry1")
-	#db_proxy.addTag("tag1")
-	#db_proxy.addEntry("entry2")
-	#db_proxy.addTag("tag2")
+	entries = db_proxy.getEntriesChronologically(10)
+	return render_template("index.html", entries = entries)
 
-	db_proxy.addTagToEntry(10,5)
-	db_proxy.removeTagFromEntry(10,5)
+@app.route('/startup/<name>')
+def startup(name):
+	return "Hello Mars. - Startup"
 
-	for entry in db_proxy.getEntriesChronologically():
-		print entry
 
-	#form = TestForm(request.form)
+@app.route('/manifesto/')
+def manifesto():
+	return "Hello Mars. - Manifesto"
 
-	return "Hello Mars."
-	
+
+@app.route('/contribute/')
+def contribute():
+	return "Hello Mars. - Contribute"
