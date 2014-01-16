@@ -4,13 +4,11 @@ import app.views.libs.db_queries as db_proxy
 from app import app, db, init_db
 
 
-class TestSequenceEntries(unittest.TestCase):
+class TestSequenceBasic(unittest.TestCase):
 
 	def setUp(self):
-		db_proxy.addEntry("entry1")
-		db_proxy.addEntry("entry2")
-		db_proxy.addEntry("entry3")
-
+		default_setup()
+		
 	def tearDown(self):
 		db_proxy.deleteAll()
 	
@@ -29,44 +27,74 @@ class TestSequenceEntries(unittest.TestCase):
 		print "test2"
 
 	def testGetEntriesByTag(self):
-		tag2 = db_proxy.addTag("tag2")
-		entry = db_proxy.addEntry("entry")
-		db_proxy.addTagToEntry(entry.getID(), tag2.getID())
+		tag = db_proxy.getTagByName("def_tag1")
+		entry = db_proxy.getEntryByName("def_entry1")
 
-		entries = db_proxy.getAllEntriesTag(tag2.getID())
+		entries = db_proxy.getAllEntriesTag(tag.getID())
 
 		self.assertEqual(len(entries), 1)
 		self.assertEqual(entries[0].entry_id, entry.getID())
 
-
+	
+	#ADMIN
 	def testAddTagToEntry(self):
-		tag1 = db_proxy.addTag("tag1")
-		tag2 = db_proxy.addTag("tag2")
-		entry = db_proxy.addEntry("entry")
+		tag1 = db_proxy.getTagByName("def_tag1")
+		tag2 = db_proxy.getTagByName("def_tag2")
+		entry = db_proxy.getEntryByName("def_entry1")
 
-		db_proxy.addTagToEntry(entry.getID(), tag1.getID())
-		db_proxy.addTagToEntry(entry.getID(), tag2.getID())
+		db_proxy.addTagToEntry(entry.getID(), tag2.getID())		
 
 		entries = db_proxy.getAllEntriesTag(tag1.getID())
 		tags = db_proxy.getAllTagsEntry(entry.getID())
 
 		self.assertEqual(entries[0].entry_id, entry.getID())
 		self.assertEqual(len(tags), 2)
+	
 
 	def testRemoveTagFromEntry(self):
-		tag1 = db_proxy.addTag("tag1")
-		entry = db_proxy.addEntry("entry")
-		db_proxy.addTagToEntry(entry.getID(), tag1.getID())
+		tag = db_proxy.getTagByName("def_tag1")
+		entry = db_proxy.getEntryByName("def_entry1")
 
-		db_proxy.removeTagFromEntry(entry.getID(), tag1.getID())
+		db_proxy.removeTagFromEntry(entry.getID(), tag.getID())
 
 		self.assertEqual(db_proxy.getAllTagsEntry(entry.getID()), [])
+
+	def testRemoveTagSimple(self):
+		tag = db_proxy.addTag("tag3")
+		db_proxy.removeTag(tag.getID())
+		self.assertEqual(db_proxy.getTagByName("tag3"), None)
+
+
+	def testRemoveTagAssignedToEntry(self):
+		tag = db_proxy.getTagByName("def_tag1")
+		entry = db_proxy.getEntryByName("def_entry1")
+		db_proxy.removeTagFromEntry(entry.getID(), tag.getID())
+	
+		association = db_proxy.getAllEntriesTag(tag.getID())
+
+		self.assertEqual(len(association), 0)
+
+		db_proxy.removeTag(tag.getID())
+		self.assertEqual(db_proxy.getTagByName("tag1"), None)
+
+
+	def testRemoveEntry(self):
+		entry = db_proxy.getEntryByName("def_entry1")
+
+		db_proxy.removeEntry(entry.getID())
+
+		self.assertEqual(db_proxy.getEntryByName("def_entry1"), None)
+		self.assertEqual(len(db_proxy.\
+			getAllEntriesTag(db_proxy.getTagByName("def_tag1").getID())), 0)
+
+	
+
 
 
 class TestSequenceSearch(unittest.TestCase):
 
 	def setUp(self):
-		#init_db("test")
+		default_setup()
 		print "init"
 
 	def tearDown(self):
@@ -74,29 +102,20 @@ class TestSequenceSearch(unittest.TestCase):
 
 	def testSearchEntry(self):
 		print "test6"
+	
 
+def default_setup():
+	def_entry1 = db_proxy.addEntry("def_entry1", "picture", "main_url",\
+		"short_description", "content", "needed")
+	def_entry2 = db_proxy.addEntry("def_entry2", "picture", "main_url",\
+		"short_description", "content", "needed")
+	def_entry3 = db_proxy.addEntry("def_entry3", "picture","main_url",\
+		"short_description", "content", "needed")
 
-class TestSequenceTags(unittest.TestCase):
+	def_tag1 = db_proxy.addTag("def_tag1")
+	def_tag2 = db_proxy.addTag("def_tag2")
 
-
-	def setUp(self):
-		print "init"
-
-	def tearDown(self):
-		db_proxy.deleteAll()
-
-	def testAddTag(self):
-		print "test"
-
-	def testRemoveTag(self):
-		print "test"
-
-	def testEditTag(self):
-		print "test"
-
-	def testEditEntry(self):
-		print "test5"
-
+	db_proxy.addTagToEntry(def_entry1.getID(), def_tag1.getID())
 
 def init_testing_db():
 	app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', \
@@ -105,4 +124,5 @@ def init_testing_db():
 
 if __name__ == "__main__":
 	init_testing_db()
+	db_proxy.deleteAll()
 	unittest.main()

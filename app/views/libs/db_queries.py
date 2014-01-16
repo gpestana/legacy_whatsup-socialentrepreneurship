@@ -11,15 +11,24 @@ def getEntryByName(name):
 	return db.session.query(app.models.Entry).\
 	filter(app.models.Entry.name == name).first()
 
-def addEntry(name):
-	entry = app.models.Entry(name)
+def addEntry(name, picture, main_url, short_description, content,\
+		needed):
+	entry = app.models.Entry(name, picture, main_url, short_description,\
+	 content, needed)
 	db.session.add(entry)
 	db.session.commit()
 	return entry
 
-def removeEntry(id):
+def removeEntry(entry_id):
 	entry = db.session.query(app.models.Entry).\
-	filter(app.models.Entry.id == id).first()
+	filter(app.models.Entry.id == entry_id).first()
+	associations = db.session.query(app.models.EntriesTagsAssociation).\
+	filter(app.models.EntriesTagsAssociation.entry_id == entry_id).all()
+
+	for association in associations:
+		db.session.delete(association)
+		db.session.commit()
+
 	db.session.delete(entry)
 	db.session.commit()
 
@@ -63,6 +72,20 @@ def addTag(name):
 	db.session.commit()
 	return tag
 
+def getTagByID(tag_id):
+	return db.session.query(app.models.Tag).\
+	filter(app.models.Tag.id == tag_id).first()
+
+def getTagByName(tag_name):
+	return db.session.query(app.models.Tag).\
+	filter(app.models.Tag.name == tag_name).first()
+
+def removeTag(tag_id):
+	tag = getTagByID(tag_id)
+	db.session.delete(tag)
+	db.session.commit()
+
+#Helpers
 def deleteAll():
 	app.models.Entry.query.delete()
 	db.session.commit()

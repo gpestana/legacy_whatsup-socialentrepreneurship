@@ -12,7 +12,7 @@ def init_db(db_name):
 	return SQLAlchemy(app)
 
 
-db = init_db("local_db")
+db = init_db("test")
 
 from app import models
 from views import general

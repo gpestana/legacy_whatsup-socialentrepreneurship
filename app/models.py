@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 
 class EntriesTagsAssociation(db.Model):
 	__tablename__ = "entries_tags_association"
+	#id = Column(Integer, primary_key = True)
 	entry_id = Column(Integer, ForeignKey('entries.id', ondelete="CASCADE"), primary_key = True)
 	tag_id = Column(Integer, ForeignKey('tags.id', ondelete="CASCADE"), primary_key = True)
 	
@@ -20,8 +21,22 @@ class Entry(db.Model):
 	name = Column(String, nullable = False)
 	tags = relationship(EntriesTagsAssociation, backref="entries")
 
-	def __init__(self, name):
+	picture = Column(String, nullable = False)
+	main_url = Column(String, nullable=False)
+	short_description = Column(String, nullable = False)
+	likes = Column(Integer, nullable = False)
+	content = Column(String, nullable = False)
+	needed = Column(String, nullable = False)
+
+	def __init__(self, name, picture, main_url, short_description, content,\
+		needed):
 		self.name = name
+		self.picture = picture
+		self.main_url = main_url
+		self.short_description = short_description
+		self.content = content
+		self.needed = needed
+		self.likes = 0
 
 	def __repr__(self):
 		return 'Entry ID ' + str(self.id)
