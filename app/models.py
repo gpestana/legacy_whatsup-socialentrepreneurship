@@ -24,9 +24,11 @@ class Entry(db.Model):
 	picture = Column(String, nullable = False)
 	main_url = Column(String, nullable=False)
 	short_description = Column(String, nullable = False)
-	likes = Column(Integer, nullable = False)
+	loves = Column(Integer, nullable = False)
 	content = Column(String, nullable = False)
 	needed = Column(String, nullable = False)
+	times_read = Column(Integer, nullable = False)
+
 
 	def __init__(self, name, picture, main_url, short_description, content,\
 		needed):
@@ -36,13 +38,20 @@ class Entry(db.Model):
 		self.short_description = short_description
 		self.content = content
 		self.needed = needed
-		self.likes = 0
+		self.loves = 0
+		self.times_read = 0
 
 	def __repr__(self):
 		return 'Entry ID ' + str(self.id)
 
 	def getID(self):
 		return self.id
+
+	def getTimesRead(self):
+		return self.times_read
+	def increaseTimesRead(self):
+		self.times_read =+ 1
+
 
 class Tag(db.Model):
 	__tablename__ = "tags"

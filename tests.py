@@ -18,6 +18,26 @@ class TestSequenceBasic(unittest.TestCase):
 		entries = db_proxy.getEntriesChronologically()
 		self.assertGreater(entries[0].getID(), entries[1].getID())
 
+	def testGetEntriesReverseChronologically(self):
+		entries = db_proxy.getEntriesReverseChronologically()
+		self.assertGreater(entries[1].getID(), entries[0].getID())
+
+	def testGetEntriesByTimesRead(self):
+		entry1 = db_proxy.getEntryByName("def_entry1")
+		entry2 = db_proxy.getEntryByName("def_entry2")
+		entry3 = db_proxy.getEntryByName("def_entry3")
+
+		db_proxy.increaseTimesRead(entry1.getID())
+		db_proxy.increaseTimesRead(entry2.getID())
+		db_proxy.increaseTimesRead(entry2.getID())
+
+		entries = db_proxy.getEntriesByTimesRead()
+
+		self.assertEqual(entries[0].getID(), entry2.getID())
+		self.assertEqual(entries[1].getID(), entry1.getID())
+		self.assertEqual(entries[2].getID(), entry3.getID())
+
+
 	def testGetNumberEntries(self):
 		nr = 2
 		entries = db_proxy.getEntriesChronologically(nr)
@@ -35,7 +55,14 @@ class TestSequenceBasic(unittest.TestCase):
 		self.assertEqual(len(entries), 1)
 		self.assertEqual(entries[0].entry_id, entry.getID())
 
-	
+	def testTimesEntryRead(self):
+		entry = db_proxy.getEntryByName("def_entry1")
+		self.assertEqual(entry.getTimesRead(), 0)
+
+		db_proxy.increaseTimesRead(entry.getID())
+		self.assertEqual(entry.getTimesRead(), 1)
+
+
 	#ADMIN
 	def testAddTagToEntry(self):
 		tag1 = db_proxy.getTagByName("def_tag1")
@@ -86,9 +113,6 @@ class TestSequenceBasic(unittest.TestCase):
 		self.assertEqual(db_proxy.getEntryByName("def_entry1"), None)
 		self.assertEqual(len(db_proxy.\
 			getAllEntriesTag(db_proxy.getTagByName("def_tag1").getID())), 0)
-
-	
-
 
 
 class TestSequenceSearch(unittest.TestCase):

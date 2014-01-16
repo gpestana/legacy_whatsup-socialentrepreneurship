@@ -32,10 +32,26 @@ def removeEntry(entry_id):
 	db.session.delete(entry)
 	db.session.commit()
 
+
 """Returns all entries ordered from newest to oldest
 """
 def getEntriesChronologically(nr_posts = None):
 	return db.session.query(app.models.Entry).limit(nr_posts).all()[::-1]
+
+"""Returns all entries ordered from newest to oldest
+"""
+def getEntriesReverseChronologically(nr_posts = None):
+	return db.session.query(app.models.Entry).limit(nr_posts).all()
+
+"""Returns all entries ordered from most visited to the least
+"""
+def getEntriesByTimesRead(nr_posts = None):
+	return db.session.query(app.models.Entry).\
+	order_by(app.models.Entry.times_read).limit(nr_posts).all()[::-1]
+
+def increaseTimesRead(entry_id):
+	entry = getEntryByID(entry_id)
+	entry.increaseTimesRead()
 
 
 #Association TAGS-ENTRIES
@@ -65,6 +81,7 @@ def removeTagFromEntry(entry_id, tag_id):
 	db.session.delete(association)
 	db.session.commit()
 
+
 #TAGS
 def addTag(name):
 	tag = app.models.Tag(name)
@@ -84,6 +101,7 @@ def removeTag(tag_id):
 	tag = getTagByID(tag_id)
 	db.session.delete(tag)
 	db.session.commit()
+
 
 #Helpers
 def deleteAll():
