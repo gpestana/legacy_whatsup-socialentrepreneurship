@@ -17,7 +17,7 @@ def populate():
 
 	db_proxy.addTagToEntry(def_entry1.getID(), def_tag1.getID())
 
-	return "DB populated successfully!"
+	return "DB populated successfuly!"
 
 @app.route('/clean/')
 def clean():
